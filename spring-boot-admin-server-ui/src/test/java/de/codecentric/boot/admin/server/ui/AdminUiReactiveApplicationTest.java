@@ -38,8 +38,8 @@ public class AdminUiReactiveApplicationTest extends AbstractAdminUiApplicationTe
 
 	@BeforeAll
 	public static void setUp() {
-		instance = new SpringApplicationBuilder().sources(TestAdminApplication.class).web(WebApplicationType.REACTIVE)
-				.run("--server.port=0",
+		instance = new SpringApplicationBuilder().sources(TestAdminApplication.class)
+				.web(WebApplicationType.REACTIVE).run("--server.port=0",
 						"--spring.boot.admin.ui.extension-resource-locations=classpath:/META-INF/test-extensions/",
 						"--spring.boot.admin.ui.available-languages=de");
 
@@ -63,7 +63,8 @@ public class AdminUiReactiveApplicationTest extends AbstractAdminUiApplicationTe
 
 		@Bean
 		public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-			return http.authorizeExchange().anyExchange().permitAll().and().csrf().disable().build();
+			return http.authorizeExchange((exchange) -> exchange.anyExchange().permitAll())
+					.csrf((csrf) -> csrf.disable()).build();
 		}
 
 	}

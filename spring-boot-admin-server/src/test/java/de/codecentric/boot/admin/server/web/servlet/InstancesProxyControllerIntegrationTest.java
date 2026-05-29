@@ -16,7 +16,7 @@
 
 package de.codecentric.boot.admin.server.web.servlet;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

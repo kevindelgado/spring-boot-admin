@@ -112,8 +112,8 @@ public class AdminApplicationHazelcastTest extends AbstractAdminApplicationTest 
 
 		@Bean
 		SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-			return http.authorizeExchange().anyExchange().permitAll()//
-					.and().csrf().disable()//
+			return http.authorizeExchange((exchange) -> exchange.anyExchange().permitAll())//
+					.csrf((csrf) -> csrf.disable())//
 					.build();
 		}
 

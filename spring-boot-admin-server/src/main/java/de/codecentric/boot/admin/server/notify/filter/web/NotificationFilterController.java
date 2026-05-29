@@ -19,7 +19,7 @@ package de.codecentric.boot.admin.server.notify.filter.web;
 import java.time.Instant;
 import java.util.Collection;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MimeTypeUtils;

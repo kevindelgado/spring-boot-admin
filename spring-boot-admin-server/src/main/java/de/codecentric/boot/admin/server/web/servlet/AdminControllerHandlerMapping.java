@@ -18,12 +18,13 @@ package de.codecentric.boot.admin.server.web.servlet;
 
 import java.lang.reflect.Method;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.util.pattern.PathPattern;
 
 import de.codecentric.boot.admin.server.web.AdminController;
 import de.codecentric.boot.admin.server.web.PathUtils;
@@ -50,12 +51,18 @@ public class AdminControllerHandlerMapping extends RequestMappingHandlerMapping 
 		if (!StringUtils.hasText(this.adminContextPath)) {
 			return mapping;
 		}
-		PatternsRequestCondition patternsCondition = new PatternsRequestCondition(
-				withNewPatterns(mapping.getPatternsCondition().getPatterns()));
-
-		return new RequestMappingInfo(patternsCondition, mapping.getMethodsCondition(), mapping.getParamsCondition(),
-				mapping.getHeadersCondition(), mapping.getConsumesCondition(), mapping.getProducesCondition(),
-				mapping.getCustomCondition());
+		Set<String> patterns;
+		if (mapping.getPathPatternsCondition() != null) {
+			patterns = mapping.getPathPatternsCondition().getPatterns().stream()
+					.map(PathPattern::getPatternString).collect(Collectors.toSet());
+		}
+		else if (mapping.getPatternsCondition() != null) {
+			patterns = mapping.getPatternsCondition().getPatterns();
+		}
+		else {
+			return mapping;
+		}
+		return mapping.mutate().paths(withNewPatterns(patterns)).build();
 	}
 
 	private String[] withNewPatterns(Set<String> patterns) {
