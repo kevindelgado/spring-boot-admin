@@ -57,20 +57,22 @@ public class SecuritySecureConfig {
 
 		http.authorizeHttpRequests(
 				(authorizeRequests) -> authorizeRequests
-						.requestMatchers(this.adminServer.path("/assets/**")).permitAll() // <1>
-						.requestMatchers(this.adminServer.path("/actuator/info")).permitAll()
-						.requestMatchers(this.adminServer.path("/actuator/health")).permitAll()
-						.requestMatchers(this.adminServer.path("/login")).permitAll().anyRequest().authenticated() // <2>
+						.requestMatchers(new AntPathRequestMatcher(this.adminServer.path("/assets/**"))).permitAll()
+						.requestMatchers(new AntPathRequestMatcher(this.adminServer.path("/actuator/info"))).permitAll()
+						.requestMatchers(new AntPathRequestMatcher(this.adminServer.path("/actuator/health")))
+						.permitAll()
+						.requestMatchers(new AntPathRequestMatcher(this.adminServer.path("/login"))).permitAll()
+						.anyRequest().authenticated()
 		).formLogin(
-				(formLogin) -> formLogin.loginPage(this.adminServer.path("/login")).successHandler(successHandler) // <3>
-		).logout((logout) -> logout.logoutUrl(this.adminServer.path("/logout"))).httpBasic(Customizer.withDefaults()) // <4>
-				.csrf((csrf) -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // <5>
+				(formLogin) -> formLogin.loginPage(this.adminServer.path("/login")).successHandler(successHandler)
+		).logout((logout) -> logout.logoutUrl(this.adminServer.path("/logout"))).httpBasic(Customizer.withDefaults())
+				.csrf((csrf) -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 						.ignoringRequestMatchers(
 								new AntPathRequestMatcher(this.adminServer.path("/instances"),
-										HttpMethod.POST.toString()), // <6>
+										HttpMethod.POST.toString()),
 								new AntPathRequestMatcher(this.adminServer.path("/instances/*"),
-										HttpMethod.DELETE.toString()), // <6>
-								new AntPathRequestMatcher(this.adminServer.path("/actuator/**")) // <7>
+										HttpMethod.DELETE.toString()),
+								new AntPathRequestMatcher(this.adminServer.path("/actuator/**"))
 						))
 				.rememberMe((rememberMe) -> rememberMe.key(UUID.randomUUID().toString()).tokenValiditySeconds(1209600));
 
