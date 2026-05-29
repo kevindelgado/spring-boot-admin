@@ -113,7 +113,6 @@ public class SpringBootAdminHazelcastApplication {
 		public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 			http.authorizeHttpRequests((authorizeRequests) -> authorizeRequests.anyRequest().permitAll())
 					.csrf((csrf) -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-							.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 							.ignoringRequestMatchers(
 									new AntPathRequestMatcher(this.adminServer.path("/instances"),
 											HttpMethod.POST.toString()),
@@ -149,7 +148,6 @@ public class SpringBootAdminHazelcastApplication {
 					.logout((logout) -> logout.logoutUrl(this.adminServer.path("/logout")))
 					.httpBasic(Customizer.withDefaults())
 					.csrf((csrf) -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-							.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 							.ignoringRequestMatchers(
 									new AntPathRequestMatcher(this.adminServer.path("/instances"),
 											HttpMethod.POST.toString()),
