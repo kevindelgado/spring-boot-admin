@@ -18,7 +18,7 @@ package de.codecentric.boot.admin.server.services;
 
 import java.util.logging.Level;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;

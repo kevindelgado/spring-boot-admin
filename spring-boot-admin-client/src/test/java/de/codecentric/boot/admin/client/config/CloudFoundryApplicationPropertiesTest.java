@@ -16,9 +16,9 @@
 
 package de.codecentric.boot.admin.client.config;
 
-import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.cloud.CloudFoundryVcapEnvironmentPostProcessor;
+import org.springframework.boot.logging.DeferredLogFactory;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.mock.env.MockEnvironment;
@@ -41,8 +41,9 @@ public class CloudFoundryApplicationPropertiesTest {
 
 		MockEnvironment env = new MockEnvironment();
 		env.setProperty("VCAP_APPLICATION", vcap);
-		new CloudFoundryVcapEnvironmentPostProcessor(LogFactory.getLog(CloudFoundryApplicationPropertiesTest.class))
-				.postProcessEnvironment(env, null);
+		DeferredLogFactory logFactory = (supplier) -> org.apache.commons.logging.LogFactory
+				.getLog(CloudFoundryApplicationPropertiesTest.class);
+		new CloudFoundryVcapEnvironmentPostProcessor(logFactory).postProcessEnvironment(env, null);
 
 		CloudFoundryApplicationProperties cfProperties = Binder.get(env)
 				.bind("vcap.application", Bindable.of(CloudFoundryApplicationProperties.class)).get();

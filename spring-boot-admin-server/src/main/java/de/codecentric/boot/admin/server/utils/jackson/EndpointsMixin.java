@@ -18,7 +18,7 @@ package de.codecentric.boot.admin.server.utils.jackson;
 
 import java.util.Collection;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 

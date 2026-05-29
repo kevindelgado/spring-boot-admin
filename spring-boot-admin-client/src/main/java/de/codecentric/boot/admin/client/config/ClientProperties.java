@@ -19,7 +19,7 @@ package de.codecentric.boot.admin.client.config;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.springframework.boot.cloud.CloudPlatform;
 import org.springframework.boot.context.properties.ConfigurationProperties;

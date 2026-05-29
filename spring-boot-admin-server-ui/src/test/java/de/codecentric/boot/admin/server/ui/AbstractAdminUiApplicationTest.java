@@ -103,7 +103,8 @@ public abstract class AbstractAdminUiApplicationTest {
 					.header("Accept", "*/*")
 					.exchange()
 					.expectStatus().isOk()
-					.expectHeader().contentType(MediaType.parseMediaType("application/javascript"));
+					.expectHeader().value("Content-Type",
+							(ct) -> assertThat(ct).isIn("application/javascript", "text/javascript"));
 		//@formatter:on
 	}
 

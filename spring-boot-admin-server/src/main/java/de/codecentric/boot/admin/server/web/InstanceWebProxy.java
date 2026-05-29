@@ -21,7 +21,7 @@ import java.net.URI;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.netty.handler.timeout.ReadTimeoutException;
@@ -125,14 +125,7 @@ public class InstanceWebProxy {
 	}
 
 	private boolean requiresBody(HttpMethod method) {
-		switch (method) {
-		case PUT:
-		case POST:
-		case PATCH:
-			return true;
-		default:
-			return false;
-		}
+		return HttpMethod.PUT.equals(method) || HttpMethod.POST.equals(method) || HttpMethod.PATCH.equals(method);
 	}
 
 	@lombok.Data

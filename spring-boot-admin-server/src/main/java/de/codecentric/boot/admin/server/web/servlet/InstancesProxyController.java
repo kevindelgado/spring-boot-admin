@@ -21,9 +21,9 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.Set;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
@@ -156,9 +156,19 @@ public class InstancesProxyController {
 	}
 
 	private String getLocalPath(String pathPattern, ServletServerHttpRequest request) {
-		String pathWithinApplication = UriComponentsBuilder.fromPath(request.getServletRequest()
-				.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE).toString()).toUriString();
-		return this.pathMatcher.extractPathWithinPattern(pathPattern, pathWithinApplication);
+		Object bestMatchingPath = request.getServletRequest()
+				.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+		Object pathAttr = request.getServletRequest()
+				.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+		if (pathAttr != null && bestMatchingPath instanceof String) {
+			// In Spring 6, pathAttr is the raw encoded path (e.g. %20 for
+			// spaces). Pass it directly to the path matcher — do not re-encode
+			// via UriComponentsBuilder.fromPath().toUriString() which would
+			// double-encode percent characters (%20 -> %2520).
+			return this.pathMatcher.extractPathWithinPattern((String) bestMatchingPath, pathAttr.toString());
+		}
+		String requestUri = request.getURI().getRawPath();
+		return this.pathMatcher.extractPathWithinPattern(pathPattern, requestUri);
 	}
 
 	private Mono<Void> writeAndFlush(Flux<DataBuffer> body, OutputStream responseBody) {

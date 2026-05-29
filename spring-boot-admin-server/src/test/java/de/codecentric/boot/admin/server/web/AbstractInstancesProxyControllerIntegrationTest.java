@@ -155,7 +155,9 @@ public abstract class AbstractInstancesProxyControllerIntegrationTest {
 
 	@Test
 	public void should_forward_requests_with_spaces_in_path() {
-		this.client.get().uri("/instances/{instanceId}/actuator/test/has spaces", this.instanceId)
+		this.client.get()
+				.uri((uriBuilder) -> uriBuilder.path("/instances/{instanceId}/actuator/test/{path}")
+						.build(this.instanceId, "has spaces"))
 				.accept(new MediaType(ApiVersion.LATEST.getProducedMimeType())).exchange().expectStatus()
 				.isEqualTo(HttpStatus.OK).expectBody().json("{ \"foo\" : \"bar-with-spaces\" }");
 

@@ -19,7 +19,7 @@ package de.codecentric.boot.admin.client.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

@@ -20,6 +20,9 @@ management:
         enabled: true
     health:
       show-details: ALWAYS
+  info:
+    env:
+      enabled: true
 
 spring:
   application:
