@@ -161,12 +161,11 @@ public class InstancesProxyController {
 		Object pathAttr = request.getServletRequest()
 				.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
 		if (pathAttr != null && bestMatchingPath instanceof String) {
-			String pathWithinApplication = UriComponentsBuilder.fromPath(pathAttr.toString()).toUriString();
-			return this.pathMatcher.extractPathWithinPattern((String) bestMatchingPath, pathWithinApplication);
-		}
-		if (pathAttr != null) {
-			String pathWithinApplication = UriComponentsBuilder.fromPath(pathAttr.toString()).toUriString();
-			return this.pathMatcher.extractPathWithinPattern(pathPattern, pathWithinApplication);
+			// In Spring 6, pathAttr is the raw encoded path (e.g. %20 for
+			// spaces). Pass it directly to the path matcher — do not re-encode
+			// via UriComponentsBuilder.fromPath().toUriString() which would
+			// double-encode percent characters (%20 -> %2520).
+			return this.pathMatcher.extractPathWithinPattern((String) bestMatchingPath, pathAttr.toString());
 		}
 		String requestUri = request.getURI().getRawPath();
 		return this.pathMatcher.extractPathWithinPattern(pathPattern, requestUri);

@@ -17,6 +17,7 @@
 package de.codecentric.boot.admin.server.cloud.config;
 
 import com.netflix.discovery.EurekaClient;
+import io.kubernetes.client.openapi.apis.CoreV1Api;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.web.reactive.function.client.ClientHttpConnectorAutoConfiguration;
@@ -64,7 +65,7 @@ public class AdminServerDiscoveryAutoConfigurationTest {
 
 	@Test
 	public void officialKubernetesServiceInstanceConverter() {
-		this.contextRunner
+		this.contextRunner.withBean(CoreV1Api.class, () -> mock(CoreV1Api.class))
 				.withBean(KubernetesInformerDiscoveryClient.class, () -> mock(KubernetesInformerDiscoveryClient.class))
 				.run((context) -> assertThat(context).getBean(ServiceInstanceConverter.class)
 						.isInstanceOf(KubernetesServiceInstanceConverter.class));
