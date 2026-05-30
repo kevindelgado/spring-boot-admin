@@ -57,37 +57,42 @@ public class SecuritySecureConfig {
 		successHandler.setDefaultTargetUrl(this.adminServer.path("/"));
 
 		http.authorizeHttpRequests(
-				(authorizeRequests) -> authorizeRequests
-						.requestMatchers(this.adminServer.path("/assets/**")).permitAll() // <1>
-						.requestMatchers(this.adminServer.path("/actuator/info")).permitAll()
-						.requestMatchers(this.adminServer.path("/actuator/health")).permitAll()
-						.requestMatchers(this.adminServer.path("/login")).permitAll().anyRequest().authenticated() // <2>
-		).formLogin(
-				(formLogin) -> formLogin.loginPage(this.adminServer.path("/login")).successHandler(successHandler) // <3>
-		).logout((logout) -> logout.logoutUrl(this.adminServer.path("/logout"))).httpBasic(Customizer.withDefaults()) // <4>
-				.csrf((csrf) -> {
-					CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
-					csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // <5>
-							.csrfTokenRequestHandler(requestHandler)
-							.ignoringRequestMatchers(
-									new AntPathRequestMatcher(this.adminServer.path("/instances"),
-											HttpMethod.POST.toString()), // <6>
-									new AntPathRequestMatcher(this.adminServer.path("/instances/*"),
-											HttpMethod.DELETE.toString()), // <6>
-									new AntPathRequestMatcher(this.adminServer.path("/actuator/**")) // <7>
-							);
-				})
-				.rememberMe((rememberMe) -> rememberMe.key(UUID.randomUUID().toString()).tokenValiditySeconds(1209600));
+				(authorizeRequests) -> authorizeRequests.requestMatchers(this.adminServer.path("/assets/**"))
+					.permitAll() // <1>
+					.requestMatchers(this.adminServer.path("/actuator/info"))
+					.permitAll()
+					.requestMatchers(this.adminServer.path("/actuator/health"))
+					.permitAll()
+					.requestMatchers(this.adminServer.path("/login"))
+					.permitAll()
+					.anyRequest()
+					.authenticated() // <2>
+		).formLogin((formLogin) -> formLogin.loginPage(this.adminServer.path("/login")).successHandler(successHandler) // <3>
+		)
+			.logout((logout) -> logout.logoutUrl(this.adminServer.path("/logout")))
+			.httpBasic(Customizer.withDefaults()) // <4>
+			.csrf((csrf) -> {
+				CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+				csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // <5>
+					.csrfTokenRequestHandler(requestHandler)
+					.ignoringRequestMatchers(
+							new AntPathRequestMatcher(this.adminServer.path("/instances"), HttpMethod.POST.toString()), // <6>
+							new AntPathRequestMatcher(this.adminServer.path("/instances/*"),
+									HttpMethod.DELETE.toString()), // <6>
+							new AntPathRequestMatcher(this.adminServer.path("/actuator/**")) // <7>
+				);
+			})
+			.rememberMe((rememberMe) -> rememberMe.key(UUID.randomUUID().toString()).tokenValiditySeconds(1209600));
 		return http.build();
 	}
 
 	@Bean
 	public InMemoryUserDetailsManager userDetailsService() {
 		UserDetails user = User.withDefaultPasswordEncoder()
-				.username(security.getUser().getName())
-				.password(security.getUser().getPassword())
-				.roles("USER")
-				.build();
+			.username(security.getUser().getName())
+			.password(security.getUser().getPassword())
+			.roles("USER")
+			.build();
 		return new InMemoryUserDetailsManager(user);
 	}
 

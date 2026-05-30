@@ -51,9 +51,9 @@ public class AdminControllerHandlerMapping extends RequestMappingHandlerMapping 
 		if (!StringUtils.hasText(this.adminContextPath)) {
 			return mapping;
 		}
-		RequestMappingInfo prefixInfo = RequestMappingInfo
-				.paths(PathUtils.normalizePath(this.adminContextPath))
-				.options(getBuilderConfiguration()).build();
+		RequestMappingInfo prefixInfo = RequestMappingInfo.paths(PathUtils.normalizePath(this.adminContextPath))
+			.options(getBuilderConfiguration())
+			.build();
 		return prefixInfo.combine(mapping);
 	}
 

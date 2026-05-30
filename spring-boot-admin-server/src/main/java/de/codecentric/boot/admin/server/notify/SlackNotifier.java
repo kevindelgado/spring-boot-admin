@@ -95,7 +95,7 @@ public class SlackNotifier extends AbstractStatusChangeNotifier {
 			return Mono.error(new IllegalStateException("'webhookUrl' must not be null."));
 		}
 		return Mono
-				.fromRunnable(() -> restTemplate.postForEntity(webhookUrl, createMessage(event, instance), Void.class));
+			.fromRunnable(() -> restTemplate.postForEntity(webhookUrl, createMessage(event, instance), Void.class));
 	}
 
 	public void setRestTemplate(RestTemplate restTemplate) {
@@ -130,8 +130,9 @@ public class SlackNotifier extends AbstractStatusChangeNotifier {
 		root.put("instance", instance);
 		root.put("lastStatus", getLastStatus(event.getInstance()));
 		SimpleEvaluationContext context = SimpleEvaluationContext
-				.forPropertyAccessors(DataBindingPropertyAccessor.forReadOnlyAccess(), new MapAccessor())
-				.withRootObject(root).build();
+			.forPropertyAccessors(DataBindingPropertyAccessor.forReadOnlyAccess(), new MapAccessor())
+			.withRootObject(root)
+			.build();
 
 		return message.getValue(context, String.class);
 	}

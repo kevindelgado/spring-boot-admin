@@ -59,8 +59,10 @@ import static org.mockito.Mockito.when;
 public class MailNotifierTest {
 
 	private final Instance instance = Instance.create(InstanceId.of("cafebabe"))
-			.register(Registration.create("application-name", "http://localhost:8081/actuator/health")
-					.managementUrl("http://localhost:8081/actuator").serviceUrl("http://localhost:8081/").build());
+		.register(Registration.create("application-name", "http://localhost:8081/actuator/health")
+			.managementUrl("http://localhost:8081/actuator")
+			.serviceUrl("http://localhost:8081/")
+			.build());
 
 	private JavaMailSender sender;
 
@@ -98,7 +100,7 @@ public class MailNotifierTest {
 
 		StepVerifier.create(notifier.notify(
 				new InstanceStatusChangedEvent(instance.getId(), instance.getVersion(), StatusInfo.ofDown(details))))
-				.verifyComplete();
+			.verifyComplete();
 
 		ArgumentCaptor<MimeMessage> mailCaptor = ArgumentCaptor.forClass(MimeMessage.class);
 		verify(sender).send(mailCaptor.capture());
@@ -122,9 +124,9 @@ public class MailNotifierTest {
 		notifier.getAdditionalProperties().put("customProperty", "HELLO WORLD!");
 
 		StepVerifier
-				.create(notifier.notify(
-						new InstanceStatusChangedEvent(instance.getId(), instance.getVersion(), StatusInfo.ofDown())))
-				.verifyComplete();
+			.create(notifier
+				.notify(new InstanceStatusChangedEvent(instance.getId(), instance.getVersion(), StatusInfo.ofDown())))
+			.verifyComplete();
 
 		ArgumentCaptor<MimeMessage> mailCaptor = ArgumentCaptor.forClass(MimeMessage.class);
 		verify(sender).send(mailCaptor.capture());
@@ -140,9 +142,9 @@ public class MailNotifierTest {
 	public void should_not_send_mail_when_disabled() {
 		notifier.setEnabled(false);
 		StepVerifier
-				.create(notifier.notify(
-						new InstanceStatusChangedEvent(instance.getId(), instance.getVersion(), StatusInfo.ofUp())))
-				.verifyComplete();
+			.create(notifier
+				.notify(new InstanceStatusChangedEvent(instance.getId(), instance.getVersion(), StatusInfo.ofUp())))
+			.verifyComplete();
 
 		verifyNoMoreInteractions(sender);
 	}
@@ -150,9 +152,9 @@ public class MailNotifierTest {
 	@Test
 	public void should_not_send_when_unknown_to_up() {
 		StepVerifier
-				.create(notifier.notify(
-						new InstanceStatusChangedEvent(instance.getId(), instance.getVersion(), StatusInfo.ofUp())))
-				.verifyComplete();
+			.create(notifier
+				.notify(new InstanceStatusChangedEvent(instance.getId(), instance.getVersion(), StatusInfo.ofUp())))
+			.verifyComplete();
 
 		verifyNoMoreInteractions(sender);
 	}
@@ -161,9 +163,9 @@ public class MailNotifierTest {
 	public void should_not_send_on_wildcard_ignore() {
 		notifier.setIgnoreChanges(new String[] { "*:UP" });
 		StepVerifier
-				.create(notifier.notify(
-						new InstanceStatusChangedEvent(instance.getId(), instance.getVersion(), StatusInfo.ofUp())))
-				.verifyComplete();
+			.create(notifier
+				.notify(new InstanceStatusChangedEvent(instance.getId(), instance.getVersion(), StatusInfo.ofUp())))
+			.verifyComplete();
 
 		verifyNoMoreInteractions(sender);
 	}
@@ -177,9 +179,9 @@ public class MailNotifierTest {
 			}
 		};
 		StepVerifier
-				.create(notifier.notify(
-						new InstanceStatusChangedEvent(instance.getId(), instance.getVersion(), StatusInfo.ofUp())))
-				.verifyComplete();
+			.create(notifier
+				.notify(new InstanceStatusChangedEvent(instance.getId(), instance.getVersion(), StatusInfo.ofUp())))
+			.verifyComplete();
 	}
 
 	private String loadExpectedBody(String resource) throws IOException {

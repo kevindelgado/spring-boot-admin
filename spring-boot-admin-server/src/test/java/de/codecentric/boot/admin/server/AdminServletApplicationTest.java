@@ -37,8 +37,9 @@ public class AdminServletApplicationTest extends AbstractAdminApplicationTest {
 	@BeforeEach
 	public void setUp() {
 		this.instance = new SpringApplicationBuilder().sources(TestAdminApplication.class)
-				.web(WebApplicationType.SERVLET).run("--server.port=0", "--management.endpoints.web.base-path=/mgmt",
-						"--management.endpoints.web.exposure.include=info,health", "--info.test=foobar");
+			.web(WebApplicationType.SERVLET)
+			.run("--server.port=0", "--management.endpoints.web.base-path=/mgmt",
+					"--management.endpoints.web.exposure.include=info,health", "--info.test=foobar");
 
 		super.setUp(this.instance.getEnvironment().getProperty("local.server.port", Integer.class, 0));
 	}
@@ -59,7 +60,7 @@ public class AdminServletApplicationTest extends AbstractAdminApplicationTest {
 			@Bean
 			public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 				http.authorizeHttpRequests((requests) -> requests.anyRequest().permitAll())
-						.csrf((csrf) -> csrf.disable());
+					.csrf((csrf) -> csrf.disable());
 				return http.build();
 			}
 

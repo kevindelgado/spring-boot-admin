@@ -42,14 +42,12 @@ public class SecurityPermitAllConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
 		http.authorizeHttpRequests((authorizeRequest) -> authorizeRequest.anyRequest().permitAll())
-				.csrf((csrf) -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-						.csrfTokenRequestHandler(requestHandler)
-						.ignoringRequestMatchers(
-								new AntPathRequestMatcher(this.adminServer.path("/instances"),
-										HttpMethod.POST.toString()),
-								new AntPathRequestMatcher(this.adminServer.path("/instances/*"),
-										HttpMethod.DELETE.toString()),
-								new AntPathRequestMatcher(this.adminServer.path("/actuator/**"))));
+			.csrf((csrf) -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+				.csrfTokenRequestHandler(requestHandler)
+				.ignoringRequestMatchers(
+						new AntPathRequestMatcher(this.adminServer.path("/instances"), HttpMethod.POST.toString()),
+						new AntPathRequestMatcher(this.adminServer.path("/instances/*"), HttpMethod.DELETE.toString()),
+						new AntPathRequestMatcher(this.adminServer.path("/actuator/**"))));
 		return http.build();
 	}
 

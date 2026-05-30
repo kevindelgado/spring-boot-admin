@@ -76,10 +76,15 @@ public class StatusUpdater {
 		}
 
 		log.debug("Update status for {}", instance);
-		return this.instanceWebClient.instance(instance).get().uri(Endpoint.HEALTH)
-				.exchangeToMono(this::convertStatusInfo).log(log.getName(), Level.FINEST)
-				.timeout(getTimeoutWithMargin()).doOnError((ex) -> logError(instance, ex))
-				.onErrorResume(this::handleError).map(instance::withStatusInfo);
+		return this.instanceWebClient.instance(instance)
+			.get()
+			.uri(Endpoint.HEALTH)
+			.exchangeToMono(this::convertStatusInfo)
+			.log(log.getName(), Level.FINEST)
+			.timeout(getTimeoutWithMargin())
+			.doOnError((ex) -> logError(instance, ex))
+			.onErrorResume(this::handleError)
+			.map(instance::withStatusInfo);
 	}
 
 	/*
@@ -91,9 +96,11 @@ public class StatusUpdater {
 	}
 
 	protected Mono<StatusInfo> convertStatusInfo(ClientResponse response) {
-		boolean hasCompatibleContentType = response.headers().contentType().filter(
-				(mt) -> mt.isCompatibleWith(MediaType.APPLICATION_JSON) || this.apiMediaTypeHandler.isApiMediaType(mt))
-				.isPresent();
+		boolean hasCompatibleContentType = response.headers()
+			.contentType()
+			.filter((mt) -> mt.isCompatibleWith(MediaType.APPLICATION_JSON)
+					|| this.apiMediaTypeHandler.isApiMediaType(mt))
+			.isPresent();
 
 		StatusInfo statusInfoFromStatus = this.getStatusInfoFromStatus(response.statusCode(), emptyMap());
 		if (hasCompatibleContentType) {

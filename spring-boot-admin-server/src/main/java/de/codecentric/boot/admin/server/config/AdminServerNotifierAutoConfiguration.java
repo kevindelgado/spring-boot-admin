@@ -81,8 +81,7 @@ public class AdminServerNotifierAutoConfiguration {
 
 			if (proxyProperties.getUsername() != null && proxyProperties.getPassword() != null) {
 				BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
-				credsProvider.setCredentials(
-						new AuthScope(proxyProperties.getHost(), proxyProperties.getPort()),
+				credsProvider.setCredentials(new AuthScope(proxyProperties.getHost(), proxyProperties.getPort()),
 						new UsernamePasswordCredentials(proxyProperties.getUsername(),
 								proxyProperties.getPassword().toCharArray()));
 				builder.setDefaultCredentialsProvider(credsProvider);

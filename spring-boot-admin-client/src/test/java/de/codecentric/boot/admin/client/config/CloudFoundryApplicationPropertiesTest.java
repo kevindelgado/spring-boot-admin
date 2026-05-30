@@ -43,11 +43,11 @@ public class CloudFoundryApplicationPropertiesTest {
 		MockEnvironment env = new MockEnvironment();
 		env.setProperty("VCAP_APPLICATION", vcap);
 		DeferredLogFactory logFactory = (supplier) -> LogFactory.getLog(CloudFoundryApplicationPropertiesTest.class);
-		new CloudFoundryVcapEnvironmentPostProcessor(logFactory)
-				.postProcessEnvironment(env, null);
+		new CloudFoundryVcapEnvironmentPostProcessor(logFactory).postProcessEnvironment(env, null);
 
 		CloudFoundryApplicationProperties cfProperties = Binder.get(env)
-				.bind("vcap.application", Bindable.of(CloudFoundryApplicationProperties.class)).get();
+			.bind("vcap.application", Bindable.of(CloudFoundryApplicationProperties.class))
+			.get();
 		assertThat(cfProperties.getApplicationId()).isEqualTo("9958288f-9842-4ddc-93dd-1ea3c90634cd");
 		assertThat(cfProperties.getInstanceIndex()).isEqualTo("0");
 	}

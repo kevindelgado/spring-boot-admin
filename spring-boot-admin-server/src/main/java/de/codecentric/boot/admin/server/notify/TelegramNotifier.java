@@ -85,7 +85,7 @@ public class TelegramNotifier extends AbstractStatusChangeNotifier {
 	@Override
 	protected Mono<Void> doNotify(InstanceEvent event, Instance instance) {
 		return Mono
-				.fromRunnable(() -> restTemplate.getForObject(buildUrl(), Void.class, createMessage(event, instance)));
+			.fromRunnable(() -> restTemplate.getForObject(buildUrl(), Void.class, createMessage(event, instance)));
 	}
 
 	protected String buildUrl() {
@@ -109,8 +109,9 @@ public class TelegramNotifier extends AbstractStatusChangeNotifier {
 		root.put("instance", instance);
 		root.put("lastStatus", getLastStatus(event.getInstance()));
 		SimpleEvaluationContext context = SimpleEvaluationContext
-				.forPropertyAccessors(DataBindingPropertyAccessor.forReadOnlyAccess(), new MapAccessor())
-				.withRootObject(root).build();
+			.forPropertyAccessors(DataBindingPropertyAccessor.forReadOnlyAccess(), new MapAccessor())
+			.withRootObject(root)
+			.build();
 
 		return message.getValue(context, String.class);
 	}

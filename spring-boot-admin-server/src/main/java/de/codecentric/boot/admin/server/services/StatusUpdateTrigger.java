@@ -46,17 +46,19 @@ public class StatusUpdateTrigger extends AbstractEventHandler<InstanceEvent> {
 	@Override
 	protected Publisher<Void> handle(Flux<InstanceEvent> publisher) {
 		return publisher
-				.filter((event) -> event instanceof InstanceRegisteredEvent
-						|| event instanceof InstanceRegistrationUpdatedEvent)
-				.flatMap((event) -> updateStatus(event.getInstance()));
+			.filter((event) -> event instanceof InstanceRegisteredEvent
+					|| event instanceof InstanceRegistrationUpdatedEvent)
+			.flatMap((event) -> updateStatus(event.getInstance()));
 	}
 
 	protected Mono<Void> updateStatus(InstanceId instanceId) {
-		return this.statusUpdater.timeout(this.intervalCheck.getInterval()).updateStatus(instanceId)
-				.onErrorResume((e) -> {
-					log.warn("Unexpected error while updating status for {}", instanceId, e);
-					return Mono.empty();
-				}).doFinally((s) -> this.intervalCheck.markAsChecked(instanceId));
+		return this.statusUpdater.timeout(this.intervalCheck.getInterval())
+			.updateStatus(instanceId)
+			.onErrorResume((e) -> {
+				log.warn("Unexpected error while updating status for {}", instanceId, e);
+				return Mono.empty();
+			})
+			.doFinally((s) -> this.intervalCheck.markAsChecked(instanceId));
 	}
 
 	@Override

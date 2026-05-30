@@ -51,10 +51,15 @@ public abstract class AbstractEventHandler<T extends InstanceEvent> {
 
 	public void start() {
 		this.scheduler = this.createScheduler();
-		this.subscription = Flux.from(this.publisher).subscribeOn(this.scheduler).log(this.log.getName(), Level.FINEST)
-				.doOnSubscribe((s) -> this.log.debug("Subscribed to {} events", this.eventType)).ofType(this.eventType)
-				.cast(this.eventType).transform(this::handle)
-				.onErrorContinue((throwable, o) -> this.log.warn("Unexpected error", throwable)).subscribe();
+		this.subscription = Flux.from(this.publisher)
+			.subscribeOn(this.scheduler)
+			.log(this.log.getName(), Level.FINEST)
+			.doOnSubscribe((s) -> this.log.debug("Subscribed to {} events", this.eventType))
+			.ofType(this.eventType)
+			.cast(this.eventType)
+			.transform(this::handle)
+			.onErrorContinue((throwable, o) -> this.log.warn("Unexpected error", throwable))
+			.subscribe();
 	}
 
 	protected abstract Publisher<Void> handle(Flux<T> publisher);

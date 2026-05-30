@@ -27,7 +27,8 @@ class ConnectionCloseExtension implements ResponseTransformerV2 {
 	@Override
 	public Response transform(Response response, ServeEvent serveEvent) {
 		return Response.Builder.like(response)
-				.headers(HttpHeaders.copyOf(response.getHeaders()).plus(new HttpHeader("Connection", "Close"))).build();
+			.headers(HttpHeaders.copyOf(response.getHeaders()).plus(new HttpHeader("Connection", "Close")))
+			.build();
 	}
 
 	@Override
