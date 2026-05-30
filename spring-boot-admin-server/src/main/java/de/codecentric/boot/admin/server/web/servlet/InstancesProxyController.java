@@ -40,7 +40,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -156,8 +155,7 @@ public class InstancesProxyController {
 	}
 
 	private String getLocalPath(String pathPattern, ServletServerHttpRequest request) {
-		String pathWithinApplication = UriComponentsBuilder.fromPath(request.getServletRequest()
-				.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE).toString()).toUriString();
+		String pathWithinApplication = request.getServletRequest().getRequestURI();
 		return this.pathMatcher.extractPathWithinPattern(pathPattern, pathWithinApplication);
 	}
 

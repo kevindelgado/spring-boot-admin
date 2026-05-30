@@ -21,7 +21,6 @@ import java.time.Duration;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.Options;
 import com.github.tomakehurst.wiremock.http.Fault;
-import org.eclipse.jetty.http.HttpStatus;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -114,7 +113,7 @@ public class ProbeEndpointsStrategyTest {
 				.create("test", this.wireMock.url("/mgmt/health")).managementUrl(this.wireMock.url("/mgmt")).build());
 
 		this.wireMock.stubFor(
-				options(urlEqualTo("/mgmt/stats")).willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND_404)));
+				options(urlEqualTo("/mgmt/stats")).willReturn(aResponse().withStatus(404)));
 
 		ProbeEndpointsStrategy strategy = new ProbeEndpointsStrategy(this.instanceWebClient,
 				new String[] { "metrics:stats" });
