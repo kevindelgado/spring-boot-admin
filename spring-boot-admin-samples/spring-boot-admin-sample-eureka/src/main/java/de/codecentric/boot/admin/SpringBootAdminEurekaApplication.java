@@ -19,14 +19,16 @@ package de.codecentric.boot.admin;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import de.codecentric.boot.admin.server.config.AdminServerProperties;
@@ -44,7 +46,7 @@ public class SpringBootAdminEurekaApplication {
 
 	@Profile("insecure")
 	@Configuration(proxyBeanMethods = false)
-	public static class SecurityPermitAllConfig extends WebSecurityConfigurerAdapter {
+	public static class SecurityPermitAllConfig {
 
 		private final String adminContextPath;
 
@@ -52,24 +54,26 @@ public class SpringBootAdminEurekaApplication {
 			this.adminContextPath = adminServerProperties.getContextPath();
 		}
 
-		@Override
-		protected void configure(HttpSecurity http) throws Exception {
-			http.authorizeRequests((authorizeRequests) -> authorizeRequests.anyRequest().permitAll())
+		@Bean
+		public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+			CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+			http.authorizeHttpRequests((authorizeRequests) -> authorizeRequests.anyRequest().permitAll())
 					.csrf((csrf) -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+							.csrfTokenRequestHandler(requestHandler)
 							.ignoringRequestMatchers(
 									new AntPathRequestMatcher(this.adminContextPath + "/instances",
 											HttpMethod.POST.toString()),
 									new AntPathRequestMatcher(this.adminContextPath + "/instances/*",
 											HttpMethod.DELETE.toString()),
 									new AntPathRequestMatcher(this.adminContextPath + "/actuator/**")));
-
+			return http.build();
 		}
 
 	}
 
 	@Profile("secure")
 	@Configuration(proxyBeanMethods = false)
-	public static class SecuritySecureConfig extends WebSecurityConfigurerAdapter {
+	public static class SecuritySecureConfig {
 
 		private final String adminContextPath;
 
@@ -77,26 +81,29 @@ public class SpringBootAdminEurekaApplication {
 			this.adminContextPath = adminServerProperties.getContextPath();
 		}
 
-		@Override
-		protected void configure(HttpSecurity http) throws Exception {
+		@Bean
+		public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 			SavedRequestAwareAuthenticationSuccessHandler successHandler = new SavedRequestAwareAuthenticationSuccessHandler();
 			successHandler.setTargetUrlParameter("redirectTo");
 			successHandler.setDefaultTargetUrl(this.adminContextPath + "/");
 
-			http.authorizeRequests((authorizeRequests) -> authorizeRequests
-					.antMatchers(this.adminContextPath + "/assets/**").permitAll()
-					.antMatchers(this.adminContextPath + "/login").permitAll().anyRequest().authenticated())
+			CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+			http.authorizeHttpRequests((authorizeRequests) -> authorizeRequests
+					.requestMatchers(this.adminContextPath + "/assets/**").permitAll()
+					.requestMatchers(this.adminContextPath + "/login").permitAll().anyRequest().authenticated())
 					.formLogin((formLogin) -> formLogin.loginPage(this.adminContextPath + "/login")
 							.successHandler(successHandler))
 					.logout((logout) -> logout.logoutUrl(this.adminContextPath + "/logout"))
 					.httpBasic(Customizer.withDefaults())
 					.csrf((csrf) -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+							.csrfTokenRequestHandler(requestHandler)
 							.ignoringRequestMatchers(
 									new AntPathRequestMatcher(this.adminContextPath + "/instances",
 											HttpMethod.POST.toString()),
 									new AntPathRequestMatcher(this.adminContextPath + "/instances/*",
 											HttpMethod.DELETE.toString()),
 									new AntPathRequestMatcher(this.adminContextPath + "/actuator/**")));
+			return http.build();
 		}
 
 	}

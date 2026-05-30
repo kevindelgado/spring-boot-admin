@@ -21,11 +21,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nullable;
+import org.springframework.lang.Nullable;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.codec.binary.Base64;
+import java.util.Base64;
 import org.springframework.context.expression.MapAccessor;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ParserContext;
@@ -115,7 +115,7 @@ public class DingTalkNotifier extends AbstractStatusChangeNotifier {
 			Mac mac = Mac.getInstance("HmacSHA256");
 			mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
 			byte[] signData = mac.doFinal(stringToSign.getBytes(StandardCharsets.UTF_8));
-			return URLEncoder.encode(new String(Base64.encodeBase64(signData)), "UTF-8");
+			return URLEncoder.encode(Base64.getEncoder().encodeToString(signData), "UTF-8");
 		}
 		catch (Exception ex) {
 			ex.printStackTrace();
