@@ -29,7 +29,9 @@ spring:
 
 ---
 spring:
-  profiles: dev
+  config:
+    activate:
+      on-profile: dev
   boot:
     admin:
       ui:
@@ -41,11 +43,15 @@ spring:
 
 ---
 spring:
-  profiles: insecure
+  config:
+    activate:
+      on-profile: insecure
 
 ---
 spring:
-  profiles: secure
+  config:
+    activate:
+      on-profile: secure
   security:
     user:
       name: "user"
@@ -62,6 +68,8 @@ spring:
 
 ---
 spring:
-  profiles: basepath
+  config:
+    activate:
+      on-profile: basepath
   webflux:
     base-path: /sba

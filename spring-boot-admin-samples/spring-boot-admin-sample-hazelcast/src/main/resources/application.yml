@@ -25,11 +25,15 @@ spring:
 
 ---
 spring:
-  profiles: insecure
+  config:
+    activate:
+      on-profile: insecure
 
 ---
 spring:
-  profiles: secure
+  config:
+    activate:
+      on-profile: secure
   security:
     user:
       name: "user"
