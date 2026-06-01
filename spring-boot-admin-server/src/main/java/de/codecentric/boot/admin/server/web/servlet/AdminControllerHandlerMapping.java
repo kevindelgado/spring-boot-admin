@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2020 the original author or authors.
+ * Copyright 2014-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,12 @@ import java.util.Set;
 
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.servlet.mvc.condition.PathPatternsRequestCondition;
 import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.util.pattern.PathPattern;
+import org.springframework.web.util.pattern.PathPatternParser;
 
 import de.codecentric.boot.admin.server.web.AdminController;
 import de.codecentric.boot.admin.server.web.PathUtils;
@@ -34,6 +37,7 @@ public class AdminControllerHandlerMapping extends RequestMappingHandlerMapping 
 
 	public AdminControllerHandlerMapping(String adminContextPath) {
 		this.adminContextPath = adminContextPath;
+		setPatternParser(new PathPatternParser());
 	}
 
 	@Override
@@ -50,15 +54,31 @@ public class AdminControllerHandlerMapping extends RequestMappingHandlerMapping 
 		if (!StringUtils.hasText(this.adminContextPath)) {
 			return mapping;
 		}
-		PatternsRequestCondition patternsCondition = new PatternsRequestCondition(
-				withNewPatterns(mapping.getPatternsCondition().getPatterns()));
 
-		return new RequestMappingInfo(patternsCondition, mapping.getMethodsCondition(), mapping.getParamsCondition(),
-				mapping.getHeadersCondition(), mapping.getConsumesCondition(), mapping.getProducesCondition(),
-				mapping.getCustomCondition());
+		PathPatternsRequestCondition pathPatternsCondition = mapping.getPathPatternsCondition();
+		if (pathPatternsCondition != null) {
+			return mapping.mutate().paths(withNewPatternsFromPathPatterns(pathPatternsCondition.getPatterns())).build();
+		}
+
+		PatternsRequestCondition patternsCondition = mapping.getPatternsCondition();
+		if (patternsCondition != null) {
+			PatternsRequestCondition newPatterns = new PatternsRequestCondition(
+					withNewPatternsFromStrings(patternsCondition.getPatterns()));
+			return new RequestMappingInfo(newPatterns, mapping.getMethodsCondition(), mapping.getParamsCondition(),
+					mapping.getHeadersCondition(), mapping.getConsumesCondition(), mapping.getProducesCondition(),
+					mapping.getCustomCondition());
+		}
+
+		return mapping;
 	}
 
-	private String[] withNewPatterns(Set<String> patterns) {
+	private String[] withNewPatternsFromPathPatterns(Set<PathPattern> patterns) {
+		return patterns.stream()
+				.map((pattern) -> PathUtils.normalizePath(this.adminContextPath + pattern.getPatternString()))
+				.toArray(String[]::new);
+	}
+
+	private String[] withNewPatternsFromStrings(Set<String> patterns) {
 		return patterns.stream().map((pattern) -> PathUtils.normalizePath(this.adminContextPath + pattern))
 				.toArray(String[]::new);
 	}
