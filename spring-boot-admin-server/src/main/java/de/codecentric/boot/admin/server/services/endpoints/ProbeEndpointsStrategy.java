@@ -89,7 +89,7 @@ public class ProbeEndpointsStrategy implements EndpointDetectionStrategy {
 			}
 			else {
 				log.debug("Endpoint probe for instance {} on endpoint '{}' failed with status {}.", instanceId, uri,
-						response.rawStatusCode());
+						response.statusCode().value());
 			}
 			return response.releaseBody().then(endpoint);
 		};

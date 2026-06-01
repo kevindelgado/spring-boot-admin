@@ -25,7 +25,7 @@ import java.util.logging.Level;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import reactor.core.publisher.Mono;
@@ -107,13 +107,14 @@ public class StatusUpdater {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected StatusInfo getStatusInfoFromStatus(HttpStatus httpStatus, Map<String, ?> body) {
+	protected StatusInfo getStatusInfoFromStatus(HttpStatusCode httpStatus, Map<String, ?> body) {
 		if (httpStatus.is2xxSuccessful()) {
 			return StatusInfo.ofUp();
 		}
 		Map<String, Object> details = new LinkedHashMap<>();
 		details.put("status", httpStatus.value());
-		details.put("error", httpStatus.getReasonPhrase());
+		org.springframework.http.HttpStatus resolved = org.springframework.http.HttpStatus.resolve(httpStatus.value());
+		details.put("error", resolved != null ? resolved.getReasonPhrase() : "HTTP " + httpStatus.value());
 		if (body.get("details") instanceof Map) {
 			details.putAll((Map<? extends String, ?>) body.get("details"));
 		}

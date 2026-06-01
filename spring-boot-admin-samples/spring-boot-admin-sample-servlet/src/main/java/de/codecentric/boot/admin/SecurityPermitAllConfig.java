@@ -47,8 +47,7 @@ public class SecurityPermitAllConfig {
 
 		http.addFilterAfter(new CustomCsrfFilter(), BasicAuthenticationFilter.class)
 				.csrf((csrf) -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-						.csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-						.ignoringRequestMatchers(
+						.csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()).ignoringRequestMatchers(
 								new AntPathRequestMatcher(this.adminServer.path("/instances"), POST.toString()),
 								new AntPathRequestMatcher(this.adminServer.path("/instances/*"), DELETE.toString()),
 								new AntPathRequestMatcher(this.adminServer.path("/actuator/**"))));

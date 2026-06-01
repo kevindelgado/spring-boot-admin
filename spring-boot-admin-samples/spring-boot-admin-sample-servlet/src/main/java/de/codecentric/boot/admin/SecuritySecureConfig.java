@@ -67,8 +67,7 @@ public class SecuritySecureConfig {
 				.requestMatchers(new AntPathRequestMatcher(this.adminServer.path("/actuator/info"))).permitAll()
 				.requestMatchers(new AntPathRequestMatcher(this.adminServer.path("/actuator/health"))).permitAll()
 				.requestMatchers(new AntPathRequestMatcher(this.adminServer.path("/login"))).permitAll()
-				.dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
-				.anyRequest().authenticated())
+				.dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll().anyRequest().authenticated())
 				.formLogin((formLogin) -> formLogin.loginPage(this.adminServer.path("/login"))
 						.successHandler(successHandler))
 				.logout((logout) -> logout.logoutUrl(this.adminServer.path("/logout")))
@@ -76,8 +75,7 @@ public class SecuritySecureConfig {
 
 		http.addFilterAfter(new CustomCsrfFilter(), BasicAuthenticationFilter.class)
 				.csrf((csrf) -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-						.csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-						.ignoringRequestMatchers(
+						.csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()).ignoringRequestMatchers(
 								new AntPathRequestMatcher(this.adminServer.path("/instances"), POST.toString()),
 								new AntPathRequestMatcher(this.adminServer.path("/instances/*"), DELETE.toString()),
 								new AntPathRequestMatcher(this.adminServer.path("/actuator/**"))));

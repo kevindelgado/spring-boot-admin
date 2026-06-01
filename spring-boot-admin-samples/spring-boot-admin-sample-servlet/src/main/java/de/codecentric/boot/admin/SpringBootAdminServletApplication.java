@@ -21,8 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.audit.AuditEventRepository;
 import org.springframework.boot.actuate.audit.InMemoryAuditEventRepository;
-import org.springframework.boot.actuate.trace.http.HttpTraceRepository;
-import org.springframework.boot.actuate.trace.http.InMemoryHttpTraceRepository;
+import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository;
+import org.springframework.boot.actuate.web.exchanges.InMemoryHttpExchangeRepository;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.metrics.buffering.BufferingApplicationStartup;
 import org.springframework.context.annotation.Bean;
@@ -88,8 +88,8 @@ public class SpringBootAdminServletApplication {
 	// end::customization-http-headers-providers[]
 
 	@Bean
-	public HttpTraceRepository httpTraceRepository() {
-		return new InMemoryHttpTraceRepository();
+	public HttpExchangeRepository httpExchangeRepository() {
+		return new InMemoryHttpExchangeRepository();
 	}
 
 	@Bean

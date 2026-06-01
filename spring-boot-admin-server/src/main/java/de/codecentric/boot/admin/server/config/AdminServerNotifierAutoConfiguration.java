@@ -19,12 +19,11 @@ package de.codecentric.boot.admin.server.config;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.HttpHost;
 import org.reactivestreams.Publisher;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -81,9 +80,10 @@ public class AdminServerNotifierAutoConfiguration {
 			builder.setProxy(new HttpHost(proxyProperties.getHost(), proxyProperties.getPort()));
 
 			if (proxyProperties.getUsername() != null && proxyProperties.getPassword() != null) {
-				CredentialsProvider credsProvider = new BasicCredentialsProvider();
+				BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
 				credsProvider.setCredentials(new AuthScope(proxyProperties.getHost(), proxyProperties.getPort()),
-						new UsernamePasswordCredentials(proxyProperties.getUsername(), proxyProperties.getPassword()));
+						new UsernamePasswordCredentials(proxyProperties.getUsername(),
+								proxyProperties.getPassword().toCharArray()));
 				builder.setDefaultCredentialsProvider(credsProvider);
 			}
 

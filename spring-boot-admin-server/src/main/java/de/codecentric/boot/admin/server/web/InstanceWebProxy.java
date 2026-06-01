@@ -81,7 +81,7 @@ public class InstanceWebProxy {
 	public Flux<InstanceResponse> forward(Flux<Instance> instances, ForwardRequest forwardRequest) {
 		return instances.flatMap((instance) -> this.forward(instance, forwardRequest, (clientResponse) -> {
 			InstanceResponse.Builder response = InstanceResponse.builder().instanceId(instance.getId())
-					.status(clientResponse.rawStatusCode())
+					.status(clientResponse.statusCode().value())
 					.contentType(String.join(", ", clientResponse.headers().header(HttpHeaders.CONTENT_TYPE)));
 			return clientResponse.bodyToMono(String.class).map(response::body).defaultIfEmpty(response)
 					.map(InstanceResponse.Builder::build);
@@ -125,14 +125,7 @@ public class InstanceWebProxy {
 	}
 
 	private boolean requiresBody(HttpMethod method) {
-		switch (method) {
-		case PUT:
-		case POST:
-		case PATCH:
-			return true;
-		default:
-			return false;
-		}
+		return HttpMethod.PUT.equals(method) || HttpMethod.POST.equals(method) || HttpMethod.PATCH.equals(method);
 	}
 
 	@lombok.Data

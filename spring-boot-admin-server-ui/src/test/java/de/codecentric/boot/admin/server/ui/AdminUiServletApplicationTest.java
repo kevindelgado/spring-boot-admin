@@ -25,7 +25,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -38,10 +37,9 @@ public class AdminUiServletApplicationTest extends AbstractAdminUiApplicationTes
 	@BeforeEach
 	public void setUp() {
 		this.instance = new SpringApplicationBuilder().sources(TestAdminApplication.class)
-			.web(WebApplicationType.SERVLET)
-			.run("--server.port=0",
-					"--spring.boot.admin.ui.extension-resource-locations=classpath:/META-INF/test-extensions/",
-					"--spring.boot.admin.ui.available-languages=de");
+				.web(WebApplicationType.SERVLET).run("--server.port=0",
+						"--spring.boot.admin.ui.extension-resource-locations=classpath:/META-INF/test-extensions/",
+						"--spring.boot.admin.ui.available-languages=de");
 
 		super.setUp(this.instance.getEnvironment().getProperty("local.server.port", Integer.class, 0));
 	}
@@ -49,11 +47,6 @@ public class AdminUiServletApplicationTest extends AbstractAdminUiApplicationTes
 	@AfterEach
 	public void shutdown() {
 		this.instance.close();
-	}
-
-	@Override
-	MediaType getExpectedMediaTypeForJavaScript() {
-		return MediaType.parseMediaType("text/javascript");
 	}
 
 	@EnableAdminServer
@@ -66,14 +59,8 @@ public class AdminUiServletApplicationTest extends AbstractAdminUiApplicationTes
 
 			@Bean
 			protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-				http.authorizeHttpRequests()
-					.anyRequest()
-					.permitAll()//
-					.and()
-					.csrf()
-					.disable()
-					.anonymous()
-					.principal("anonymousUser");
+				http.authorizeHttpRequests().anyRequest().permitAll()//
+						.and().csrf().disable().anonymous().principal("anonymousUser");
 				return http.build();
 			}
 
