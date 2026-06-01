@@ -16,7 +16,7 @@
 
 package de.codecentric.boot.admin.server.web.reactive;
 
-import javax.annotation.Nullable;
+import org.springframework.lang.Nullable;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

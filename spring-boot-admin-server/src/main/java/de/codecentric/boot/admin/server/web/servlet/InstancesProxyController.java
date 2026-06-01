@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2020 the original author or authors.
+ * Copyright 2014-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,9 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.Set;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -93,7 +92,7 @@ public class InstancesProxyController {
 		// org.springframework.security.web.context.HttpSessionSecurityContextRepository.SaveToSessionRequestWrapper.startAsync()
 		AsyncContext asyncContext = servletRequest.startAsync();
 		asyncContext.setTimeout(-1); // no timeout because instanceWebProxy will handle it
-										// for us
+		// for us
 		try {
 			ServletServerHttpRequest request = new ServletServerHttpRequest(
 					(HttpServletRequest) asyncContext.getRequest());
@@ -156,8 +155,8 @@ public class InstancesProxyController {
 	}
 
 	private String getLocalPath(String pathPattern, ServletServerHttpRequest request) {
-		String pathWithinApplication = UriComponentsBuilder.fromPath(request.getServletRequest()
-				.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE).toString()).toUriString();
+		String pathWithinApplication = request.getServletRequest()
+				.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE).toString();
 		return this.pathMatcher.extractPathWithinPattern(pathPattern, pathWithinApplication);
 	}
 

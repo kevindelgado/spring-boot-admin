@@ -27,7 +27,7 @@ public final class PathUtils {
 		if (!StringUtils.hasText(path)) {
 			return path;
 		}
-		String normalizedPath = path;
+		String normalizedPath = path.replaceAll("//+", "/");
 		if (!normalizedPath.startsWith("/")) {
 			normalizedPath = "/" + normalizedPath;
 		}

@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.logging.Level;
 
-import javax.annotation.Nullable;
+import org.springframework.lang.Nullable;
 
 import lombok.Getter;
 import lombok.Setter;
