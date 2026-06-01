@@ -21,7 +21,7 @@ import java.net.URI;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 
-import javax.annotation.Nullable;
+import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.netty.handler.timeout.ReadTimeoutException;
