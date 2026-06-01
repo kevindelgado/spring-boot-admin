@@ -162,7 +162,9 @@ public class InstancesProxyController {
 	}
 
 	private String getLocalPath(String pathPattern, ServletServerHttpRequest request) {
-		String pathWithinApplication = request.getServletRequest().getRequestURI();
+		String requestUri = request.getServletRequest().getRequestURI();
+		String contextPath = request.getServletRequest().getContextPath();
+		String pathWithinApplication = requestUri.substring(contextPath.length());
 		return this.pathMatcher.extractPathWithinPattern(pathPattern, pathWithinApplication);
 	}
 
