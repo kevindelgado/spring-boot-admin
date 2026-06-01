@@ -16,7 +16,7 @@
 
 package de.codecentric.boot.admin.server.web.servlet;
 
-import javax.annotation.Nullable;
+import org.springframework.lang.Nullable;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,8 +36,8 @@ public class InstancesProxyControllerIntegrationTest extends AbstractInstancesPr
 	@BeforeAll
 	public static void setUpContext() {
 		context = new SpringApplicationBuilder().sources(AdminServletApplicationTest.TestAdminApplication.class)
-				.web(WebApplicationType.SERVLET)
-				.run("--server.port=0", "--spring.boot.admin.monitor.default-timeout=2500");
+			.web(WebApplicationType.SERVLET)
+			.run("--server.port=0", "--spring.boot.admin.monitor.default-timeout=2500");
 
 	}
 

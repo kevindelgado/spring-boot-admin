@@ -61,7 +61,8 @@ class MailNotifierIntegrationTest implements WithAssertions {
 		assertThatThrownBy(() -> {
 			mailNotifier.setTemplate("/de/codecentric/boot/admin/server/notify/vulnerable-file.html");
 			String body = mailNotifier.getBody(new Context());
-		}).getRootCause().hasMessageContaining("error=2, No such file or directory");
+		}).hasRootCauseMessage(
+				"Access is forbidden for type 'org.springframework.util.ReflectionUtils' in this expression context.");
 	}
 
 	@EnableAdminServer

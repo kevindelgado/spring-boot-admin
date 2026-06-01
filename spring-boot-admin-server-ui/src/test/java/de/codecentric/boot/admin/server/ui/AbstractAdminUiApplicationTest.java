@@ -103,7 +103,8 @@ public abstract class AbstractAdminUiApplicationTest {
 					.header("Accept", "*/*")
 					.exchange()
 					.expectStatus().isOk()
-					.expectHeader().contentType(MediaType.parseMediaType("application/javascript"));
+					.expectHeader().value("Content-Type",
+							(ct) -> assertThat(ct).containsIgnoringCase("javascript"));
 		//@formatter:on
 	}
 
@@ -127,7 +128,8 @@ public abstract class AbstractAdminUiApplicationTest {
 					.accept(MediaType.ALL)
 					.exchange()
 					.expectStatus().isOk()
-					.expectHeader().contentTypeCompatibleWith("application/javascript")
+					.expectHeader().value("Content-Type",
+							(ct) -> assertThat(ct).containsIgnoringCase("javascript"))
 					.expectBody(String.class)
 					.value((body) -> assertThat(body).contains("\"availableLanguages\":[\"de\"]"));
 		//@formatter:on
@@ -141,7 +143,8 @@ public abstract class AbstractAdminUiApplicationTest {
 			.accept(MediaType.ALL)
 			.exchange()
 			.expectStatus().isOk()
-			.expectHeader().contentTypeCompatibleWith("application/javascript")
+			.expectHeader().value("Content-Type",
+					(ct) -> assertThat(ct).containsIgnoringCase("javascript"))
 			.expectBody(String.class)
 			.value((body) -> assertThat(body).contains("\"pollTimer\""))
 			.value((body) -> assertThat(body).contains("\"cache\":2500"));

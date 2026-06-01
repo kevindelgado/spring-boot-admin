@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import reactor.core.publisher.Mono;
@@ -75,10 +76,15 @@ public class StatusUpdater {
 		}
 
 		log.debug("Update status for {}", instance);
-		return this.instanceWebClient.instance(instance).get().uri(Endpoint.HEALTH)
-				.exchangeToMono(this::convertStatusInfo).log(log.getName(), Level.FINEST)
-				.timeout(getTimeoutWithMargin()).doOnError((ex) -> logError(instance, ex))
-				.onErrorResume(this::handleError).map(instance::withStatusInfo);
+		return this.instanceWebClient.instance(instance)
+			.get()
+			.uri(Endpoint.HEALTH)
+			.exchangeToMono(this::convertStatusInfo)
+			.log(log.getName(), Level.FINEST)
+			.timeout(getTimeoutWithMargin())
+			.doOnError((ex) -> logError(instance, ex))
+			.onErrorResume(this::handleError)
+			.map(instance::withStatusInfo);
 	}
 
 	/*
@@ -90,9 +96,11 @@ public class StatusUpdater {
 	}
 
 	protected Mono<StatusInfo> convertStatusInfo(ClientResponse response) {
-		boolean hasCompatibleContentType = response.headers().contentType().filter(
-				(mt) -> mt.isCompatibleWith(MediaType.APPLICATION_JSON) || this.apiMediaTypeHandler.isApiMediaType(mt))
-				.isPresent();
+		boolean hasCompatibleContentType = response.headers()
+			.contentType()
+			.filter((mt) -> mt.isCompatibleWith(MediaType.APPLICATION_JSON)
+					|| this.apiMediaTypeHandler.isApiMediaType(mt))
+			.isPresent();
 
 		StatusInfo statusInfoFromStatus = this.getStatusInfoFromStatus(response.statusCode(), emptyMap());
 		if (hasCompatibleContentType) {
@@ -107,13 +115,14 @@ public class StatusUpdater {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected StatusInfo getStatusInfoFromStatus(HttpStatus httpStatus, Map<String, ?> body) {
+	protected StatusInfo getStatusInfoFromStatus(HttpStatusCode httpStatus, Map<String, ?> body) {
 		if (httpStatus.is2xxSuccessful()) {
 			return StatusInfo.ofUp();
 		}
 		Map<String, Object> details = new LinkedHashMap<>();
 		details.put("status", httpStatus.value());
-		details.put("error", httpStatus.getReasonPhrase());
+		details.put("error", (httpStatus instanceof HttpStatus) ? ((HttpStatus) httpStatus).getReasonPhrase()
+				: "HTTP " + httpStatus.value());
 		if (body.get("details") instanceof Map) {
 			details.putAll((Map<? extends String, ?>) body.get("details"));
 		}

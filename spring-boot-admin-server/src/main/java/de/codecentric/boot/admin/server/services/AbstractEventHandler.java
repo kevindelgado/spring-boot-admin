@@ -18,7 +18,7 @@ package de.codecentric.boot.admin.server.services;
 
 import java.util.logging.Level;
 
-import javax.annotation.Nullable;
+import org.springframework.lang.Nullable;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -51,10 +51,15 @@ public abstract class AbstractEventHandler<T extends InstanceEvent> {
 
 	public void start() {
 		this.scheduler = this.createScheduler();
-		this.subscription = Flux.from(this.publisher).subscribeOn(this.scheduler).log(this.log.getName(), Level.FINEST)
-				.doOnSubscribe((s) -> this.log.debug("Subscribed to {} events", this.eventType)).ofType(this.eventType)
-				.cast(this.eventType).transform(this::handle)
-				.onErrorContinue((throwable, o) -> this.log.warn("Unexpected error", throwable)).subscribe();
+		this.subscription = Flux.from(this.publisher)
+			.subscribeOn(this.scheduler)
+			.log(this.log.getName(), Level.FINEST)
+			.doOnSubscribe((s) -> this.log.debug("Subscribed to {} events", this.eventType))
+			.ofType(this.eventType)
+			.cast(this.eventType)
+			.transform(this::handle)
+			.onErrorContinue((throwable, o) -> this.log.warn("Unexpected error", throwable))
+			.subscribe();
 	}
 
 	protected abstract Publisher<Void> handle(Flux<T> publisher);

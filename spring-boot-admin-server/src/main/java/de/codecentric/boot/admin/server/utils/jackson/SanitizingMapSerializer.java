@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nullable;
+import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -60,7 +60,7 @@ public class SanitizingMapSerializer extends StdSerializer<Map<String, String>> 
 		}
 
 		boolean matchesAnyPattern = Arrays.stream(this.keysToSanitize)
-				.anyMatch((pattern) -> pattern.matcher(key).matches());
+			.anyMatch((pattern) -> pattern.matcher(key).matches());
 		return matchesAnyPattern ? "******" : value;
 	}
 

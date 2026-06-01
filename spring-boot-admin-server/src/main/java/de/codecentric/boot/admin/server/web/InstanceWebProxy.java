@@ -21,7 +21,7 @@ import java.net.URI;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 
-import javax.annotation.Nullable;
+import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.netty.handler.timeout.ReadTimeoutException;
@@ -73,18 +73,21 @@ public class InstanceWebProxy {
 			}
 			else {
 				return Mono.defer(() -> responseHandler
-						.apply(ClientResponse.create(HttpStatus.SERVICE_UNAVAILABLE, this.strategies).build()));
+					.apply(ClientResponse.create(HttpStatus.SERVICE_UNAVAILABLE, this.strategies).build()));
 			}
 		});
 	}
 
 	public Flux<InstanceResponse> forward(Flux<Instance> instances, ForwardRequest forwardRequest) {
 		return instances.flatMap((instance) -> this.forward(instance, forwardRequest, (clientResponse) -> {
-			InstanceResponse.Builder response = InstanceResponse.builder().instanceId(instance.getId())
-					.status(clientResponse.rawStatusCode())
-					.contentType(String.join(", ", clientResponse.headers().header(HttpHeaders.CONTENT_TYPE)));
-			return clientResponse.bodyToMono(String.class).map(response::body).defaultIfEmpty(response)
-					.map(InstanceResponse.Builder::build);
+			InstanceResponse.Builder response = InstanceResponse.builder()
+				.instanceId(instance.getId())
+				.status(clientResponse.statusCode().value())
+				.contentType(String.join(", ", clientResponse.headers().header(HttpHeaders.CONTENT_TYPE)));
+			return clientResponse.bodyToMono(String.class)
+				.map(response::body)
+				.defaultIfEmpty(response)
+				.map(InstanceResponse.Builder::build);
 		}));
 	}
 
@@ -92,8 +95,9 @@ public class InstanceWebProxy {
 			Function<ClientResponse, Mono<V>> responseHandler) {
 		log.trace("Proxy-Request for instance {} with URL '{}'", instance.getId(), forwardRequest.getUri());
 		WebClient.RequestBodySpec bodySpec = this.instanceWebClient.instance(instance)
-				.method(forwardRequest.getMethod()).uri(forwardRequest.getUri())
-				.headers((h) -> h.addAll(forwardRequest.getHeaders()));
+			.method(forwardRequest.getMethod())
+			.uri(forwardRequest.getUri())
+			.headers((h) -> h.addAll(forwardRequest.getHeaders()));
 
 		WebClient.RequestHeadersSpec<?> headersSpec = bodySpec;
 		if (requiresBody(forwardRequest.getMethod())) {
@@ -113,7 +117,7 @@ public class InstanceWebProxy {
 				log.trace("Timeout for Proxy-Request for instance {} with URL '{}'", instance.getId(),
 						forwardRequest.getUri());
 				return responseHandler
-						.apply(ClientResponse.create(HttpStatus.GATEWAY_TIMEOUT, this.strategies).build());
+					.apply(ClientResponse.create(HttpStatus.GATEWAY_TIMEOUT, this.strategies).build());
 			}
 			if (cause instanceof IOException) {
 				log.trace("Proxy-Request for instance {} with URL '{}' errored", instance.getId(),
@@ -125,14 +129,7 @@ public class InstanceWebProxy {
 	}
 
 	private boolean requiresBody(HttpMethod method) {
-		switch (method) {
-		case PUT:
-		case POST:
-		case PATCH:
-			return true;
-		default:
-			return false;
-		}
+		return HttpMethod.PUT.equals(method) || HttpMethod.POST.equals(method) || HttpMethod.PATCH.equals(method);
 	}
 
 	@lombok.Data

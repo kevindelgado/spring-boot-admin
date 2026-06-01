@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
-import javax.annotation.Nullable;
+import org.springframework.lang.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,11 +87,12 @@ public class RemindingNotifier extends AbstractEventNotifier {
 	public void start() {
 		this.reminderScheduler = Schedulers.newSingle("reminders");
 		this.subscription = Flux.interval(this.checkReminderInverval, this.reminderScheduler)
-				.log(log.getName(), Level.FINEST).doOnSubscribe((s) -> log.debug("Started reminders"))
-				.flatMap((i) -> this.sendReminders())
-				.retryWhen(Retry.indefinitely()
-						.doBeforeRetry((s) -> log.warn("Unexpected error when sending reminders", s.failure())))
-				.subscribe();
+			.log(log.getName(), Level.FINEST)
+			.doOnSubscribe((s) -> log.debug("Started reminders"))
+			.flatMap((i) -> this.sendReminders())
+			.retryWhen(Retry.indefinitely()
+				.doBeforeRetry((s) -> log.warn("Unexpected error when sending reminders", s.failure())))
+			.subscribe();
 	}
 
 	public void stop() {
@@ -110,10 +111,10 @@ public class RemindingNotifier extends AbstractEventNotifier {
 		Instant now = Instant.now();
 
 		return Flux.fromIterable(this.reminders.values())
-				.filter((reminder) -> reminder.getLastNotification().plus(this.reminderPeriod).isBefore(now))
-				.flatMap((reminder) -> this.delegate.notify(reminder.getEvent())
-						.doOnSuccess((signal) -> reminder.setLastNotification(now)))
-				.then();
+			.filter((reminder) -> reminder.getLastNotification().plus(this.reminderPeriod).isBefore(now))
+			.flatMap((reminder) -> this.delegate.notify(reminder.getEvent())
+				.doOnSuccess((signal) -> reminder.setLastNotification(now)))
+			.then();
 	}
 
 	protected boolean shouldStartReminder(InstanceEvent event) {

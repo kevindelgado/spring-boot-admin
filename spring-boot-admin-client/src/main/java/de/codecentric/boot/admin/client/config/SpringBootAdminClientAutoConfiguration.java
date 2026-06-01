@@ -19,7 +19,7 @@ package de.codecentric.boot.admin.client.config;
 import java.util.Collections;
 import java.util.List;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointAutoConfiguration;
@@ -141,7 +141,7 @@ public class SpringBootAdminClientAutoConfiguration {
 		@ConditionalOnMissingBean
 		public RegistrationClient registrationClient(ClientProperties client) {
 			RestTemplateBuilder builder = new RestTemplateBuilder().setConnectTimeout(client.getConnectTimeout())
-					.setReadTimeout(client.getReadTimeout());
+				.setReadTimeout(client.getReadTimeout());
 			if (client.getUsername() != null && client.getPassword() != null) {
 				builder = builder.basicAuthentication(client.getUsername(), client.getPassword());
 			}

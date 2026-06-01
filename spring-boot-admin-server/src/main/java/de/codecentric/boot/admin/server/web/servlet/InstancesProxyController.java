@@ -21,9 +21,9 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.Set;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
@@ -40,7 +40,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -102,27 +101,29 @@ public class InstancesProxyController {
 					this.adminContextPath + INSTANCE_MAPPED_PATH);
 
 			this.instanceWebProxy
-					.forward(this.registry.getInstance(InstanceId.of(instanceId)), fwdRequest, (clientResponse) -> {
-						ServerHttpResponse response = new ServletServerHttpResponse(
-								(HttpServletResponse) asyncContext.getResponse());
-						response.setStatusCode(clientResponse.statusCode());
-						response.getHeaders()
-								.addAll(this.httpHeadersFilter.filterHeaders(clientResponse.headers().asHttpHeaders()));
-						try {
-							OutputStream responseBody = response.getBody();
-							response.flush();
-							return clientResponse.body(BodyExtractors.toDataBuffers()).window(1)
-									.concatMap((body) -> writeAndFlush(body, responseBody)).then();
-						}
-						catch (IOException ex) {
-							return Mono.error(ex);
-						}
-					})
-					// We need to explicitly block so the headers are recieved and written
-					// before any async dispatch otherwise the FrameworkServlet will add
-					// wrong
-					// Allow header for OPTIONS request
-					.block();
+				.forward(this.registry.getInstance(InstanceId.of(instanceId)), fwdRequest, (clientResponse) -> {
+					ServerHttpResponse response = new ServletServerHttpResponse(
+							(HttpServletResponse) asyncContext.getResponse());
+					response.setStatusCode(clientResponse.statusCode());
+					response.getHeaders()
+						.addAll(this.httpHeadersFilter.filterHeaders(clientResponse.headers().asHttpHeaders()));
+					try {
+						OutputStream responseBody = response.getBody();
+						response.flush();
+						return clientResponse.body(BodyExtractors.toDataBuffers())
+							.window(1)
+							.concatMap((body) -> writeAndFlush(body, responseBody))
+							.then();
+					}
+					catch (IOException ex) {
+						return Mono.error(ex);
+					}
+				})
+				// We need to explicitly block so the headers are recieved and written
+				// before any async dispatch otherwise the FrameworkServlet will add
+				// wrong
+				// Allow header for OPTIONS request
+				.block();
 		}
 		finally {
 			asyncContext.complete();
@@ -137,7 +138,7 @@ public class InstancesProxyController {
 
 		ServletServerHttpRequest request = new ServletServerHttpRequest(servletRequest);
 		Flux<DataBuffer> cachedBody = DataBufferUtils.readInputStream(request::getBody, this.bufferFactory, 4096)
-				.cache();
+			.cache();
 
 		InstanceWebProxy.ForwardRequest fwdRequest = createForwardRequest(request, cachedBody,
 				this.adminContextPath + APPLICATION_MAPPED_PATH);
@@ -147,17 +148,23 @@ public class InstancesProxyController {
 	private InstanceWebProxy.ForwardRequest createForwardRequest(ServletServerHttpRequest request,
 			Flux<DataBuffer> body, String pathPattern) {
 		String endpointLocalPath = this.getLocalPath(pathPattern, request);
-		URI uri = UriComponentsBuilder.fromPath(endpointLocalPath).query(request.getURI().getRawQuery()).build(true)
-				.toUri();
+		URI uri = UriComponentsBuilder.fromPath(endpointLocalPath)
+			.query(request.getURI().getRawQuery())
+			.build(true)
+			.toUri();
 
-		return InstanceWebProxy.ForwardRequest.builder().uri(uri).method(request.getMethod())
-				.headers(this.httpHeadersFilter.filterHeaders(request.getHeaders()))
-				.body(BodyInserters.fromDataBuffers(body)).build();
+		return InstanceWebProxy.ForwardRequest.builder()
+			.uri(uri)
+			.method(request.getMethod())
+			.headers(this.httpHeadersFilter.filterHeaders(request.getHeaders()))
+			.body(BodyInserters.fromDataBuffers(body))
+			.build();
 	}
 
 	private String getLocalPath(String pathPattern, ServletServerHttpRequest request) {
-		String pathWithinApplication = UriComponentsBuilder.fromPath(request.getServletRequest()
-				.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE).toString()).toUriString();
+		String requestUri = request.getServletRequest().getRequestURI();
+		String contextPath = request.getServletRequest().getContextPath();
+		String pathWithinApplication = requestUri.substring(contextPath.length());
 		return this.pathMatcher.extractPathWithinPattern(pathPattern, pathWithinApplication);
 	}
 

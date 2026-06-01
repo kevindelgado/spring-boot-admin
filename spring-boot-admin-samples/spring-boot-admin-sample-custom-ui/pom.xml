@@ -63,6 +63,7 @@
                             <arguments>run build</arguments>
                             <environmentVariables>
                                 <PROJECT_VERSION>${project.version}</PROJECT_VERSION>
+                                <NODE_OPTIONS>--openssl-legacy-provider</NODE_OPTIONS>
                             </environmentVariables>
                         </configuration>
                     </execution>

@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.logging.Level;
 
-import javax.annotation.Nullable;
+import org.springframework.lang.Nullable;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -81,11 +81,13 @@ public class IntervalCheck {
 	public void start() {
 		this.scheduler = Schedulers.newSingle(this.name + "-check");
 		this.subscription = Flux.interval(this.interval)
-				.doOnSubscribe((s) -> log.debug("Scheduled {}-check every {}", this.name, this.interval))
-				.log(log.getName(), Level.FINEST).subscribeOn(this.scheduler).concatMap((i) -> this.checkAllInstances())
-				.retryWhen(Retry.backoff(Long.MAX_VALUE, Duration.ofSeconds(1))
-						.doBeforeRetry((s) -> log.warn("Unexpected error in {}-check", this.name, s.failure())))
-				.subscribe(null, (error) -> log.error("Unexpected error in {}-check", name, error));
+			.doOnSubscribe((s) -> log.debug("Scheduled {}-check every {}", this.name, this.interval))
+			.log(log.getName(), Level.FINEST)
+			.subscribeOn(this.scheduler)
+			.concatMap((i) -> this.checkAllInstances())
+			.retryWhen(Retry.backoff(Long.MAX_VALUE, Duration.ofSeconds(1))
+				.doBeforeRetry((s) -> log.warn("Unexpected error in {}-check", this.name, s.failure())))
+			.subscribe(null, (error) -> log.error("Unexpected error in {}-check", name, error));
 	}
 
 	public void markAsChecked(InstanceId instanceId) {
@@ -95,8 +97,11 @@ public class IntervalCheck {
 	protected Mono<Void> checkAllInstances() {
 		log.debug("check {} for all instances", this.name);
 		Instant expiration = Instant.now().minus(this.minRetention);
-		return Flux.fromIterable(this.lastChecked.entrySet()).filter((entry) -> entry.getValue().isBefore(expiration))
-				.map(Map.Entry::getKey).flatMap(this.checkFn).then();
+		return Flux.fromIterable(this.lastChecked.entrySet())
+			.filter((entry) -> entry.getValue().isBefore(expiration))
+			.map(Map.Entry::getKey)
+			.flatMap(this.checkFn)
+			.then();
 	}
 
 	public void stop() {

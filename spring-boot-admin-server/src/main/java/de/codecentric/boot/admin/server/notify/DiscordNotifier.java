@@ -20,7 +20,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nullable;
+import org.springframework.lang.Nullable;
 
 import org.springframework.context.expression.MapAccessor;
 import org.springframework.expression.Expression;
@@ -119,8 +119,9 @@ public class DiscordNotifier extends AbstractStatusChangeNotifier {
 		root.put("instance", instance);
 		root.put("lastStatus", getLastStatus(event.getInstance()));
 		SimpleEvaluationContext context = SimpleEvaluationContext
-				.forPropertyAccessors(DataBindingPropertyAccessor.forReadOnlyAccess(), new MapAccessor())
-				.withRootObject(root).build();
+			.forPropertyAccessors(DataBindingPropertyAccessor.forReadOnlyAccess(), new MapAccessor())
+			.withRootObject(root)
+			.build();
 		return message.getValue(context, String.class);
 	}
 
